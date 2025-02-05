@@ -16,7 +16,18 @@ struct PokemonDetailsHeader: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             Circle()
-                .fill(pokemonType.color)
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(stops: [
+                            .init(color: pokemonType.color, location: 0.7),
+                            .init(
+                                color: pokemonType.color.opacity(0.1),
+                                location: 1.0),
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .frame(
                     width: screenWidth * 1.5,
                     height: screenWidth * 1.5,
@@ -42,7 +53,9 @@ struct PokemonDetailsHeader: View {
 #Preview {
     PokemonDetailsHeader(
         screenWidth: 500, screenHeight: 500,
-        pokemonType: .bug, pokemonImage: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+        pokemonType: .bug,
+        pokemonImage:
+            "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
         pokemonSize: 100
     )
 }

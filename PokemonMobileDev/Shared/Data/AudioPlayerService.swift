@@ -17,6 +17,7 @@ final class AudioPlayerService: AudioPlayerServiceProtocol {
     func loadAudio(from url: URL) async throws -> Result<
         AVAudioPlayer, any Error
     > {
+        try AVAudioSession.sharedInstance().setCategory(.playback)
         let (data, httpResponse) = try await URLSession.shared.data(from: url)
 
         guard let httpResponse = httpResponse as? HTTPURLResponse,
