@@ -35,7 +35,7 @@ class PokedexTabViewModel: ObservableObject {
                 a.id < b.id
             }
             pokemonsResource = .success(currentPokemons)
-            currentPage += 1
+            currentPage = (currentPokemons.count / 20) + 1
             applyFilters()
         case .failure(let failure):
             pokemonsResource = .failure(failure)

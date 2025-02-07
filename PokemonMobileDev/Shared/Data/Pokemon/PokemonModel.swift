@@ -45,12 +45,14 @@ extension PokemonModel {
         height = try container.decode(Int.self, forKey: .height)
         weight = try container.decode(Int.self, forKey: .weight)
         order = try container.decode(Int.self, forKey: .order)
-        abilities = try container
+        abilities =
+            try container
             .decode([AbilityNamedModel].self, forKey: .abilities)
         cries = try container.decode(CriesModel.self, forKey: .cries)
-        forms = try container
+        forms =
+            try container
             .decode([NamedApiResourceModel].self, forKey: .forms)
-    
+
         var movesArray = try container.nestedUnkeyedContainer(forKey: .moves)
         var tempMoves = [NamedApiResourceModel]()
 
@@ -66,12 +68,13 @@ extension PokemonModel {
         }
 
         moves = tempMoves
-        
+
         sprites = try container.decode(SpritesModel.self, forKey: .sprites)
-        types = try container
+        types =
+            try container
             .decode([PokemonTypeNamedModel].self, forKey: .types)
     }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(name, forKey: .name)
@@ -82,7 +85,7 @@ extension PokemonModel {
         try container.encode(abilities, forKey: .abilities)
         try container.encode(cries, forKey: .cries)
         try container.encode(forms, forKey: .forms)
-        
+
         // Encode moves in a nested "move" container
         var movesArray = container.nestedUnkeyedContainer(forKey: .moves)
         for singleMove in moves {
@@ -95,15 +98,15 @@ extension PokemonModel {
         try container.encode(sprites, forKey: .sprites)
         try container.encode(types, forKey: .types)
     }
-    
-    var toEntity: Pokemon{
+
+    var toEntity: Pokemon {
         return Pokemon(
             name: name,
             id: id,
             height: height,
             weight: weight,
             order: order,
-            abilities: abilities.map{ $0.toEntity },
+            abilities: abilities.map { $0.toEntity },
             cries: cries.toEntity,
             forms: forms.map({ form in
                 form.toEntity
@@ -112,8 +115,41 @@ extension PokemonModel {
                 move.toEntity
             }),
             sprites: sprites.toEntity,
-            types: types.map{ $0.toEntity }
+            types: types.map { $0.toEntity }
         )
-    
+
+    }
+
+    var toPokemonSwiftDataModel: PokemonSwiftDataModel {
+        return PokemonSwiftDataModel(
+            name: name,
+            id: id,
+            height: height,
+            weight: weight,
+            order: order,
+            abilities: abilities.map {
+                AbilityNamedSwiftDataModel(ability: $0.ability)
+            },
+            cries: CriesSwiftDataModel(
+                latest: cries.latest, legacy: cries.legacy),
+            forms: forms.map {
+                NamedApiResourceSwiftDataModel(name: $0.name, url: $0.url)
+            },
+            moves: moves.map {
+                NamedApiResourceSwiftDataModel(name: $0.name, url: $0.url)
+            },
+            sprites: SpritesSwiftDataModel(
+                backDefault: sprites.backDefault,
+                frontDefault: sprites.frontDefault,
+                frontFemale: sprites.frontFemale,
+                frontShiny: sprites.frontShiny,
+                frontShinyFemale: sprites.frontShinyFemale),
+            types: types.map {
+                PokemonTypeNamedSwiftDataModel(
+                    slot: $0.slot,
+                    type: NamedApiResourceSwiftDataModel(
+                        name: $0.type.name, url: $0.type.url))
+            }
+        )
     }
 }
